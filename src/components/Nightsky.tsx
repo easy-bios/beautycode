@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/vs2015.css';
-import { highlightLanguages } from '../constants';
+import { exampleCode, highlightLanguages } from '../constants';
+import { themes } from '../themes';
 import { toJpeg } from 'html-to-image';
 import {
     Button,
@@ -15,13 +16,12 @@ import {
     TextField,
 } from '@mui/material';
 import Image from 'next/image';
+import download from 'downloadjs';
 
 function Example() {
-    const [code, setCode] = useState(`function x() {
-    var greet = 'Hello World';
-    console.log(greet);
-}`);
+    const [code, setCode] = useState(exampleCode);
     const [language, setLanguage] = useState('auto');
+    const [theme, setTheme] = useState('nightsky');
     const [square, setSquare] = useState(false);
     const [image, setImage] = useState('');
     const codeRef = useRef<HTMLDivElement>(null);
@@ -30,7 +30,10 @@ function Example() {
         if (codeRef.current === null) return;
 
         const data = await toJpeg(codeRef.current);
-        setImage(data);
+
+        process.env.NODE_ENV === 'development'
+            ? setImage(data)
+            : download(data, 'beautycode.jpeg');
     };
 
     const highligtedCode =
@@ -40,6 +43,13 @@ function Example() {
 
     return (
         <>
+            <style jsx global>{`
+                body {
+                    background: ${themes[theme].background};
+                    color: ${themes[theme].color};
+                }
+            `}</style>
+
             <h1>BeautyCode</h1>
             <p>Create beautiful Code Screenshots in seconds!</p>
             <FormGroup sx={{ width: '100%', gap: '1rem' }}>
@@ -50,7 +60,8 @@ function Example() {
                     variant="outlined"
                     sx={{
                         '& > div': {
-                            background: 'linear-gradient(-45deg, #08f0, #08f2)',
+                            background: themes[theme].codeBackground,
+                            color: themes[theme].codeColor,
                         },
                     }}
                     value={code}
@@ -58,17 +69,16 @@ function Example() {
                 />
 
                 <FormControl fullWidth>
-                    <InputLabel id="select-label">Language</InputLabel>
+                    <InputLabel id="select-language">Language</InputLabel>
                     <Select
-                        labelId="select-label"
-                        id="select"
+                        labelId="select-language"
+                        id="language"
                         value={language}
                         label="Language"
                         onChange={(e) => setLanguage(e.target.value)}
                         sx={{
                             '& > div': {
-                                background:
-                                    'linear-gradient(-45deg, #08f0, #08f2)',
+                                background: themes[theme].codeBackground,
                             },
                         }}
                     >
@@ -87,6 +97,30 @@ function Example() {
                     </Select>
                 </FormControl>
 
+                {/* <FormControl fullWidth>
+                    <InputLabel id="select-theme">Theme</InputLabel>
+                    <Select
+                        labelId="select-theme"
+                        id="theme"
+                        value={theme}
+                        label="Theme"
+                        onChange={(e) => setTheme(e.target.value)}
+                        sx={{
+                            '& > div': {
+                                background: themes[theme].codeBackground,
+                            },
+                        }}
+                    >
+                        {Object.entries(themes).map(([key, value]) => {
+                            return (
+                                <MenuItem value={key} key={key}>
+                                    {value.name}
+                                </MenuItem>
+                            );
+                        })}
+                    </Select>
+                </FormControl> */}
+
                 <FormControlLabel
                     control={
                         <Checkbox
@@ -100,8 +134,9 @@ function Example() {
 
             <div
                 style={{
-                    background:
-                        'linear-gradient(45deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%)',
+                    background: themes[theme].codeBackground,
+                    border: '1px solid #fff4',
+                    borderRadius: themes[theme].borderRadius,
                     color: 'white',
                     display: 'flex',
                     alignItems: 'center',
@@ -115,8 +150,8 @@ function Example() {
                         display: 'flex',
                         alignItems: 'center',
                         padding: '1em',
-                        background: '#000b',
-                        border: '1px solid white',
+                        background: '#0008',
+                        border: '1px solid #fff8',
                         borderRadius: '3px',
                         aspectRatio: square ? 1 : 'auto',
                     }}
@@ -134,8 +169,12 @@ function Example() {
                 </pre>
             </div>
 
-            <Button onClick={captureImage} variant="contained">
-                To Image
+            <Button
+                onClick={captureImage}
+                variant="contained"
+                sx={{ background: 'dodgerblue', color: 'white' }}
+            >
+                Download as Image
             </Button>
 
             {image && (

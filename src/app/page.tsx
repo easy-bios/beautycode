@@ -1,6 +1,6 @@
 'use client';
 
-import Example from '../components/Example';
+import Nightsky from '../components/Nightsky';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -15,7 +15,7 @@ export default function Home() {
         <ThemeProvider theme={darkTheme}>
             <CssBaseline />
             <main>
-                <Example />
+                <Nightsky />
             </main>
         </ThemeProvider>
     );
