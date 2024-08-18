@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import hljs from 'highlight.js';
+import hljs from 'highlight.js/lib/common';
 import 'highlight.js/styles/vs2015.css';
 import { exampleCode, highlightLanguages } from '../constants';
 import { themes } from '../themes';
@@ -7,6 +7,8 @@ import { toJpeg } from 'html-to-image';
 import {
     Button,
     Checkbox,
+    createTheme,
+    CssBaseline,
     FormControl,
     FormControlLabel,
     FormGroup,
@@ -14,6 +16,7 @@ import {
     MenuItem,
     Select,
     TextField,
+    ThemeProvider,
 } from '@mui/material';
 import Image from 'next/image';
 import download from 'downloadjs';
@@ -25,6 +28,12 @@ function Example() {
     const [square, setSquare] = useState(false);
     const [image, setImage] = useState('');
     const codeRef = useRef<HTMLDivElement>(null);
+
+    const darkTheme = createTheme({
+        palette: {
+            mode: 'dark',
+        },
+    });
 
     const captureImage = async () => {
         if (codeRef.current === null) return;
@@ -42,7 +51,9 @@ function Example() {
             : hljs.highlight(code, { language, ignoreIllegals: true });
 
     return (
-        <>
+        <ThemeProvider theme={darkTheme}>
+            <CssBaseline />
+
             <style jsx global>{`
                 body {
                     background: ${themes[theme].background};
@@ -186,7 +197,7 @@ function Example() {
                     unoptimized
                 />
             )}
-        </>
+        </ThemeProvider>
     );
 }
 
